@@ -1,0 +1,33 @@
+---
+flavors:
+  templates:
+    default:
+      name: "{{ flavor.name }}"
+      ram: "{{ flavor.ram }}"
+      disk: "20"
+      ephemeral: "0"
+      vcpus: "{{ flavor.vcpus }}"
+      public: "True"
+      properties:
+        cpu_shares: "{{ flavor.vcpus * 1000 }}"
+        disk_total_iops_sec: "1000"
+        vif_inbound_peak: "65536"
+        vif_outbound_peak: "65536"
+  regex:
+    name: "[a-z]{1,3}[0-9]+\\.[a-z]+"
+  configs:
+  - name: m1.tiny
+    ram: 1024
+    vcpus: 1
+  - name: m1.small
+    ram: 2048
+    vcpus: 2
+  - name: m1.medium
+    ram: 4096
+    vcpus: 4
+  - name: m1.large
+    ram: 8192
+    vcpus: 8
+  - name: m1.xlarge
+    ram: 16384
+    vcpus: 16

@@ -1,0 +1,39 @@
+---
+projects:
+  templates:
+    default:
+      description: "Auto-created"
+      domain: "default"
+      enable: true
+      name: "CLOUD-PROD-{{ project.name }}"
+      properties:
+        contact: "{{ project.contact }} <{{ project.email }}>"
+        department: "{{ project.department }}"
+      users:
+      - user_domain: default
+        user_name: billing
+        role: admin
+    special1:
+      description: "Auto-created"
+      domain: "default"
+      enable: true
+      name: "CLOUD-SPECIAL-{{ project.name }}"
+      properties: {}
+      users:
+      - user_domain: default
+        user_name: billing
+        role: admin
+  regex:
+    name: "[A-Za-z0-9]+"
+    contact: "([A-Z][a-z\\.-]+\\s*){1,3}"
+    email: "(^[a-zA-Z0-9_\\.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$)"
+  configs:
+  - name: "myproject1"
+    department: "Marketing"
+    contact: "Max Mustermann"
+    email: "max.mustermann@gmail.de"
+  - name: "myproject2"
+    template: "special1"
+    department: "Finance"
+    contact: "Foo Bar"
+    email: "fbar@gmail.de"
