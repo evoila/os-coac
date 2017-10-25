@@ -26,7 +26,7 @@ class ProjectResourceManager(ResourceManager):
   LOG = logging.getLogger(__name__)
 
   __templates = {}
-  __user_assignments = []
+  __user_assignments = {}
   __configs = []
   __regex = {}
 
@@ -62,7 +62,7 @@ class ProjectResourceManager(ResourceManager):
 	  template.name,
           config['role']
         )
-        self.__user_assignments.append(user_assignment)
+        self.__user_assignments[name] = user_assignment
         self.LOG.debug('Created user assignment for user: {}/{}'.format(user_assignment.user_domain, user_assignment.user_name))
 
     # Extract regular expressions and project configuration data
