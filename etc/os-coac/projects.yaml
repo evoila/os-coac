@@ -21,7 +21,7 @@ projects:
       properties: {}
       users:
       - user_domain: default
-        user_name: billing
+        user_name: fwadmin
         role: admin
   regex:
     name: "[A-Za-z0-9]+"
