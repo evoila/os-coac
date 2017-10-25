@@ -24,6 +24,12 @@ class Hook(ABC):
   def run(self):
     pass
 
+  def factory(config):
+    if config['type'] == 'system':
+      return SystemHook(config['name'],
+			config['parameters'],
+     			config['environment'])
+
 class SystemHook(Hook):
 
   LOG = logging.getLogger(__name__)

@@ -5,6 +5,7 @@ import logging
 from jinja2 import Template
 from os_coac.project.model import ProjectTemplate, UserAssignment
 from os_coac import ResourceManager
+from os_coac.hook import Hook
 from oslo_config import cfg
 from oslo_config import types
 
@@ -29,6 +30,7 @@ class ProjectResourceManager(ResourceManager):
   __user_assignments = {}
   __configs = []
   __regex = {}
+  __hooks = {}
 
   def __init__(self):
     pass
@@ -64,6 +66,18 @@ class ProjectResourceManager(ResourceManager):
         )
         self.__user_assignments[name] = user_assignment
         self.LOG.debug('Created user assignment for user: {}/{}'.format(user_assignment.user_domain, user_assignment.user_name))
+
+      # Generate Hook objects for current ProjectTemplate
+      hook_configs = self.data['projects']['templates'][name]['hooks']
+      for config in hook_configs:
+        hook = Hook.factory(config)
+
+        if not hook:
+          self.LOG.warn('Unable to create Hook fron config "{}"'.format(config))
+          continue
+
+        self.__hooks[name] = hook
+        self.LOG.debug('Created hook: {}'.format(hook.name))
 
     # Extract regular expressions and project configuration data
     self.__regex = self.data['projects']['regex']
