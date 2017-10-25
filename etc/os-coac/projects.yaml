@@ -13,6 +13,13 @@ projects:
       - user_domain: default
         user_name: billing
         role: admin
+      hooks:
+      - type: system
+        name: example.sh
+        parameters: ['param1', 'param2']
+        environment: {
+          foo: "bar"
+        }
     special1:
       description: "Auto-created"
       domain: "default"
@@ -23,6 +30,7 @@ projects:
       - user_domain: default
         user_name: fwadmin
         role: admin
+      hooks: []
   regex:
     name: "[A-Za-z0-9]+"
     contact: "([A-Z][a-z\\.-]+\\s*){1,3}"
