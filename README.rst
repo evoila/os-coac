@@ -7,7 +7,8 @@ The project was initiated by the need to create OpenStack projects as a result t
 
 Features
 --------
-- Templated management of Keystone Projects
+- Keystone Projects
+- Nova Flavors
 
 Running
 -------
