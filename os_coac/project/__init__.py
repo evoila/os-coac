@@ -55,6 +55,7 @@ class ProjectResourceManager(ResourceManager):
       self.LOG.debug('Created template: {}'.format(name))
   
       # Generate UserAssignment objects for current ProjectTemplate
+      self.__user_assignments[name] = []
       user_configs = self.data['projects']['templates'][name]['users']
       for config in user_configs:
         user_assignment = UserAssignment(
@@ -64,10 +65,11 @@ class ProjectResourceManager(ResourceManager):
 	  template.name,
           config['role']
         )
-        self.__user_assignments[name] = user_assignment
+        self.__user_assignments[name].append(user_assignment)
         self.LOG.debug('Created user assignment for user: {}/{}'.format(user_assignment.user_domain, user_assignment.user_name))
 
       # Generate Hook objects for current ProjectTemplate
+      self.__hooks[name] = []
       hook_configs = self.data['projects']['templates'][name]['hooks']
       for config in hook_configs:
         hook = Hook.factory(config)
@@ -76,12 +78,15 @@ class ProjectResourceManager(ResourceManager):
           self.LOG.warn('Unable to create Hook fron config "{}"'.format(config))
           continue
 
-        self.__hooks[name] = hook
+        self.__hooks[name].append(hook)
         self.LOG.debug('Created hook: {}'.format(hook.name))
 
     # Extract regular expressions and project configuration data
     self.__regex = self.data['projects']['regex']
-    self.__configs = self.data['projects']['configs']
+    for config in self.data['projects']['configs']:
+      if not 'template' in config.keys():
+        config['template'] = 'default'
+      self.__configs = self.data['projects']['configs']
 
     self.LOG.info('Loaded {} templates, {} user assignments, {} regular expressions and {} configs.'.format(
       len(self.__templates.keys()),
@@ -161,10 +166,30 @@ class ProjectResourceManager(ResourceManager):
       self.LOG.warn("Failed to validate projects. See output for more information.")
 
     # Generate project definitions from templates
-    projects = []
+    tasks = []
     for config in self.__configs:
-      template = self.__templates[config['template']]  
+      template_name = config['template']
+
+      # Generate project definition
+      template = self.__templates[template_name]  
       project = self.__generate_project(template, config)
-      projects.append(project)
+
+      # Fetch other objects
+      user_assignments = self.__user_assignments[config['template']] if config['template'] in self.__user_assignments.keys() else []
+      hooks = self.__hooks[config['template']] if config['template'] in self.__hooks.keys() else []
+
+      tasks.append({
+        'project': project,
+        'user_assignments': user_assignments,
+        'hooks': hooks
+        })
+
       self.LOG.debug('Generated project from template "{}": {}'.format(config['template'], project))
-    self.LOG.info('Generated projects: {}'.format(len(projects)))
+
+    self.LOG.info('Generated projects: {}'.format(len(tasks)))
+
+    for task in tasks:
+      self.__synchronize_project(task['project'], task['user_assignments'], task['hooks'])
+
+  def __synchronize_project(self, project, user_assignments, hooks):
+    self.LOG.info('Synchronizing project {} with {} users and {} hooks'.format(project['name'], len(user_assignments), len(hooks)))
