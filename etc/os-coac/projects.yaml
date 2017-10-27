@@ -17,9 +17,8 @@ projects:
       - type: system
         name: example.sh
         parameters: ['param1', 'param2']
-        environment: {
+        environment:
           foo: "bar"
-        }
     special1:
       description: "Auto-created"
       domain: "default"
